@@ -90,6 +90,13 @@ public:
 		if (temp == NULL) {
 			cout << "\n Word Not found";
 		} else {
+			if(temp->word == w)
+			{
+				headNodes[k] = temp->next;
+				delete(temp);
+				return;
+			}
+			
 			Node *p = temp;
 			while (temp != NULL && temp->word != w) {
 				p = temp;
