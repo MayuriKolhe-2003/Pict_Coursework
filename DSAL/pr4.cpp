@@ -1,130 +1,98 @@
 #include <iostream>
-#include <string.h>
-#define size 10
-
 using namespace std;
 
-class data {
+class data{
 	string name;
-	int telno;
-public:
-	data() {
-		name = " ";
-		telno = -1;
+	int no;
+	public:
+	data(){
+		name = "";
+		no = -1;
+	}
+	data(int n,string name){
+		no = n;
+		name = name;
 	}
 	friend class hashTable;
 };
 
-class hashTable {
+class hashTable{
 	data *ht;
-public:
-	hashTable() {
+	int size;
+	public:
+	hashTable(){
+		ht = nullptr;
+		size = 0;
+	}
+	hashTable(int s){
+		size = s;
 		ht = new data[size];
 	}
-	int hashFunction(int key) {
-		/*int i = 1, unit = 0;
-		 int sum = 0;
-		 while (key > 0) {
-		 unit = key % 10;
-		 sum = sum + (unit * i * i);
-		 key = key / 10;
-		 i++;
-		 }*/
-		return (key % size);
+	int hashFunction(int key){
+		return key%size;
 	}
-	void display() {
-		cout << "----Hash Table---\n";
-		for (int i = 0; i < size; i++) {
-			cout << "[" << i << "]\t" << ht[i].name << "\t" << ht[i].telno
-					<< "\n";
+
+	void display()
+	{
+		cout<<"Hashtable content "<<endl;
+		for(int i=0;i<size;i++)
+		{
+			cout << "[ "<<i<<" ] -> " <<ht[i].no << "\t" <<ht[i].name <<endl;
 		}
 	}
-	void insert_without_replacement(int telno, string name) {
-		int hashIndex;
-		hashIndex = hashFunction(telno);
 
-		while (ht[hashIndex].telno != -1) {
-			if (ht[hashIndex].telno == telno) {
-//cout << "Duplicate\n";
+	void insert_without_rep(int telno , string name)
+	{
+		int hashIndex = hashFunction(telno);
+		while(ht[hashIndex].no != -1){
+			if(ht[hashIndex].no == telno){
 				return;
 			}
-			hashIndex = (hashIndex + 1) % size;
-
+			hashIndex = (hashIndex+1)%size;
 		}
-		ht[hashIndex].telno = telno;
+		ht[hashIndex].no = telno;
 		ht[hashIndex].name = name;
+		cout<<"inserted at : "<<hashIndex<<endl;
 	}
-	void insert_with_replacement(int telno, string name) {
-		int hashIndex, curr, temp;
-		hashIndex = hashFunction(telno);
 
-//index empty
-		if (ht[hashIndex].telno == -1) {
-			ht[hashIndex].telno = telno;
+	void insert_with_rep(int telno, string name)
+	{
+		int temp,curr;
+		string tempN;
+		int hashIndex = hashFunction(telno);
+
+		if(ht[hashIndex].no == -1){
+			ht[hashIndex].no = telno;
 			ht[hashIndex].name = name;
-		} else if (ht[hashIndex].telno != -1) {
-			temp = ht[hashIndex].telno;
+		}else{
+			temp = ht[hashIndex].no;
+			tempN = ht[hashIndex].name;
 			curr = hashFunction(temp);
-			if (curr == hashIndex) {
-				hashIndex = (hashIndex + 1) % size;
-			} else {
-				ht[hashIndex].telno = telno;
+;
+			if(curr == hashIndex){
+				hashIndex = (hashIndex+1)%size;
+				insert_without_rep(telno , name);
+			}else{
+				cout<<temp <<":"<<tempN<<endl;
+				ht[hashIndex].no = telno;
 				ht[hashIndex].name = name;
 				telno = temp;
+				insert_without_rep(telno,tempN);
 			}
+			
 		}
-
-		while (ht[hashIndex].telno != -1) {
-			if (ht[hashIndex].telno == telno) {
-				cout << "Duplicate\n";
-				return;
-			}
-			hashIndex = (hashIndex + 1) % size;
-		}
-
-		ht[hashIndex].telno = telno;
-		ht[hashIndex].name = name;
-
 	}
-
-	void search(int telno) {
-		int hashIndex;
-		int cmp = 1; //number of cmparisons
-		hashIndex = hashFunction(telno);
-
-//if stored at hashIndex itself
-		if (ht[hashIndex].telno == telno) {
-			cout << "Element found at :" << hashIndex << " found in :" << cmp
-					<< " comparisons." << endl;
-			return;
-		}
-
-		while (cmp != size) {
-			cmp++;
-			hashIndex = (hashIndex + 1) % size;
-			if (ht[hashIndex].telno == telno) {
-				cout << "Element found at :" << hashIndex << " found in :"
-						<< cmp << " comparisons." << endl;
-				return;
-			}
-		}
-		cout << "Not found \n";
-	}
-
 };
 
-using namespace std;
 
-int main() {
-	hashTable h1;
-	h1.insert_with_replacement(11, "abc");
-	h1.insert_with_replacement(1, "vbh");
-	h1.insert_with_replacement(21, "iou");
-	h1.insert_with_replacement(3, "iou");
-
-	h1.display();
-
-//h1.search();
-
+int main()
+{
+	hashTable h(10);
+	h.insert_with_rep(12,"abc");
+	h.insert_with_rep(22,"exy");
+	h.insert_with_rep(33,"x");
+	h.insert_with_rep(44,"44");
+	h.display();
+	
 	return 0;
 }
