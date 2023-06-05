@@ -88,13 +88,13 @@ public:
 
 	Node* RLRotation(Node *t) {
 		t->right = LLRotation(t->right);
-		return LLRotation(t);
+		return RRRotation(t);
 
 	}
 
 	Node* LRRotation(Node *t) {
 		t->left = RRRotation(t->left);
-		return RRRotation(t);
+		return LLRotation(t);
 	}
 
 	Node* balance(Node *node) {
