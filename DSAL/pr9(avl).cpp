@@ -86,13 +86,13 @@ public:
 		return newRoot;
 	}
 
-	Node* LRRotation(Node *t) {
+	Node* RLRotation(Node *t) {
 		t->right = LLRotation(t->right);
 		return LLRotation(t);
 
 	}
 
-	Node* RLRotation(Node *t) {
+	Node* LRRotation(Node *t) {
 		t->left = RRRotation(t->left);
 		return RRRotation(t);
 	}
