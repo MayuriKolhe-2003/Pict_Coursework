@@ -1,286 +1,259 @@
 #include <iostream>
+#include <string>
+#include <bits/stdc++.h>
+#include <stack>
+#include <queue>
+
 using namespace std;
 
-class node {
+class node{
 	int data;
-	node *right;
+	bool lbit;
+	bool rbit;
 	node *left;
-	bool rbit, lbit;
-	friend class TBT;
+	node *right;
 public:
-
-	node() {
-		data = 0;
-		right = left = NULL;
-		rbit = lbit = 0;
+	node()
+	{
+		data = -1;
+		left = right = nullptr;
+		lbit = rbit = 0;
 	}
-	node(int x) {
-		data = x;
-		right = left = NULL;
-		rbit = lbit = 0;
+	node(int d){
+		data = d;
+		left = right = nullptr;
+		lbit = rbit =0;
 	}
+	friend class tbt;
+	
 };
 
-class TBT {
-	node *root;
-	node *head;
-public:
-	TBT() {
-		root = NULL;
-		head = NULL;
-	}
-	node* getRoot() {
-		return root;
-	}
-	void Insert(int x);
-	void Inorder();
-	void Preorder();
-	int search(int x, node *&curr, node *&parent);
-	void remove(int x);
+class tbt{
+    node* root;
+    node* head;
+    public:
+      tbt(){
+          root = nullptr;
+          head = nullptr;
+          std::cout << "cr" << std::endl;
+      }
+      node* getroot(){
+          std::cout << "root : "<<root->data << std::endl;
+          return root;
+      }
+    void setroot(node* r){
+        root = r;
+    }
+    
+    bool search(node* &curr, node* &par,int key)
+    {
+        while(curr != head)
+        {
+            if(curr->data == key){
+                return true;
+            }else{
+                par = curr;
+                if(curr->data > key){
+                    curr = curr->left;
+                }else{
+                    curr = curr->right;
+                }
+            }
+        }
+        return false;
+    }
+    
+    void insert(int key)
+    {
+        if(root == nullptr)
+        {
+            head = new node();
+            root = new node(key);
+            head->right = head;
+            head->left = root;
+            
+            root->left = head;
+            root->right = head;
+            std::cout << "root" << std::endl;
+        }
+        else
+        {
+            node *nn = new node(key);
+            node *p = root;
+            while(1)
+            {
+                if(p->data > nn->data)
+                {
+                    if(p->lbit != 0){
+                        p = p->left;
+                    }else{
+                        nn->left = p->left;
+                        nn->right = p;
+                        p->left = nn;
+                        p->lbit = 1;
+                        std::cout << "in left :"<<p->data << std::endl;
+                        return;
+                    }
+                    
+                }else{
+                    if(p->rbit != 0){
+                        p = p->right;
+                    }else{
+                        nn->right = p->right;
+                        nn->left = p;
+                        p->right = nn;
+                        p->rbit = 1;
+                        std::cout << "in right :"<<p->data << std::endl;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    
+    void inorder()
+    {
+        node *t = root;
+        while(t->lbit != 0){
+            t = t->left;
+        }
+        
+        while(t != head)
+        {
+            cout<<t->data <<" ";
+            if(t->rbit != 0){
+                t = t->right;
+                while(t->lbit != 0){
+                    t= t->left;
+                }
+            }else{
+                t = t->right;
+            }
+        }
+    }
+    
+    void preorder()
+    {
+        node*t = root;
+        while(t != head)
+        {
+            cout<<t->data <<" ";
+            if(t->lbit == 1){
+                t = t->left;
+            }else if(t->rbit == 1){
+                t = t->right;
+            }else{
+                while(t->rbit != 1 && t!=head){
+                    t = t->right;
+                }
+                if(t != head){
+                    t = t->right;
+                }
+            }
+        }
+    }
+    
+    void remove(int key)
+    {
+        if(root == nullptr){
+            std::cout << "empty" << std::endl;
+        }else{
+            node *curr = root;
+            node *par = nullptr;
+            bool found = search(curr,par,key);
+            if(!found ){
+                std::cout << "not" << std::endl;
+                return;
+            }else{
+                //2 child
+                if(curr->lbit==1 && curr->rbit==1){
+                    node *succ = curr->right;
+                    par = curr;
+                    while(succ->lbit != 0){
+                        par = succ;
+                        succ = succ->left;
+                    }
+                    curr->data = succ->data;
+                    curr = succ;
+                }
+                // leaf nodes both threads
+                if(curr->lbit==0 && curr->rbit==0){
+                    if(curr == par->left){
+                        par->left = curr->left;
+                        par->lbit = 0;
+                    }
+                    else{
+                        par->right = curr->right;
+                        par->rbit = 0;
+                    }
+                    delete curr;
+                }
+                
+                //left link and right thread
+                if(curr->lbit==1 && curr->rbit==0)
+                {
+                    node*tmp = curr->left;
+                    if(par->left==curr){
+                        par->left = tmp;
+                    }else{
+                        par->right = tmp;
+                    }
+                    while(tmp->rbit != 0){
+                        tmp = tmp->right;
+                    }
+                    tmp->right = curr->right;
+                    delete curr;
+                }
+                
+                //left thread and right link
+                if(curr->lbit ==0 && curr->rbit==1)
+                {
+                    node*tmp = curr->right;
+                    if(par->left == curr){
+                        par->left = tmp;
+                    }
+                    else{
+                        par->right = tmp;
+                    }
+                    while(tmp->lbit != 0){
+                        tmp = tmp->left;
+                    }
+                    tmp->left = curr->left;
+                    delete curr;
+                }
+            }
+        }
+    }
+    
+   
 };
 
-int TBT::search(int x, node *&curr, node *&parent) {
-	int count = 0;
-	while (curr != head) {
-		count++;
-		if (curr->data == x) {
-			return count;
-		} else {
-			parent = curr;
-			if (curr->data > x) {
-				if (curr->lbit == 1) {
-					curr = curr->left;
-				}
-			} else {
-				if (curr->rbit == 1) {
-					curr = curr->right;
-				}
-			}
-		}
-	}
-	return count;
-}
+int main()
+{
+    tbt t;
+    t.insert(30);
+    t.insert(20);
+    t.insert(40);
+    t.insert(35);
+    t.insert(25);
+    t.insert(10);
+    
+    t.inorder();
+    cout<<endl;
+    //t.preorder();
+    cout<<endl;
+    
+    t.remove(30);
+    t.remove(20);
+    t.remove(10);
 
-void TBT::Insert(int x) {
-	if (root == NULL) {
-//create header node
-		head = new node();
-		head->right = head;
+    t.inorder();
+    cout<<endl;
+    t.preorder();
+    cout<<endl;
+    t.getroot();
+    
 
-		root = new node(x);
-		root->left = head;
-		root->right = head;
-
-		head->left = root;
-
-		cout << "\nInserted at root.";
-	} else {
-		node *p;
-		node *temp = new node(x);
-		p = root;
-
-		while (1) {
-//insert x at left
-			if (p->data > x) {
-//p has left link
-				if (p->lbit != 0) {
-					p = p->left;
-				} else {
-					temp->left = p->left;
-					temp->right = p;
-					p->lbit = 1;
-					p->left = temp;
-					cout << "\nInserted left :" << x << " Parent : [" << p->data
-							<< "]";
-					return;
-				}
-			}
-//insert at right
-			else {
-//if p has left link
-				if (p->rbit != 0) {
-					p = p->right;
-				} else {
-					temp->right = p->right;
-					temp->left = p;
-					p->rbit = 1;
-					p->right = temp;
-					cout << "\nInserted right :" << x << " Parent : ["
-							<< p->data << "]";
-					return;
-				}
-			}
-		}
-	}
-}
-
-void TBT::Inorder() {
-	cout << "\nInorder Traversal : ";
-	if (root == NULL) {
-		cout << "\nTree empty...";
-		return;
-	}
-	node *temp;
-	temp = root;
-//go to extreme left node of tree
-	while (temp->lbit != 0) {
-		temp = temp->left;
-	}
-	while (temp != head) {
-		cout << temp->data << "\t";
-//if temp has a right link goto leftmost node of right subtree
-		if (temp->rbit != 0) {
-			temp = temp->right;
-			while (temp->lbit != 0) {
-				temp = temp->left;
-			}
-		}
-//if temp has right thread
-		else {
-			temp = temp->right;
-		}
-	}
-}
-
-void TBT::Preorder() {
-	cout << "\nPreorder Traversal : ";
-	if (root == NULL) {
-		cout << "\nTree empty...";
-		return;
-	}
-	node *temp;
-	temp = root;
-
-//start from printing root
-	while (temp != head) {
-		cout << temp->data << "\t";
-//left is link
-		if (temp->lbit == 1) {
-			temp = temp->left;
-		}
-//right is link
-		else if (temp->rbit == 1) {
-			temp = temp->right;
-		} else {
-			while (temp->rbit != 1 && temp != head) {
-				temp = temp->right;
-			}
-			if (temp != head) {
-				temp = temp->right;
-			}
-		}
-
-	}
-
-}
-
-void TBT::remove(int x) {
-	node *p;
-	node *curr;
-	node *succ;
-	if (root == NULL) {
-		cout << "\n Tree is empty...";\
-	}
-	p = head;
-	curr = root;
-	search(x, curr, p);
-	cout << curr->data;
-	cout << p->data;
-
-//if curr has both links
-	if (curr->lbit == 1 && curr->rbit == 1) {
-		p = curr;
-		succ = curr->right;
-		while (succ->lbit != 0) {
-			p = succ;
-			succ = succ->left;
-		}
-		curr->data = succ->data;
-		curr = succ;
-	}
-//if curr has both threads
-	if (curr->lbit == 0 && curr->rbit == 0) {
-//if curr is left child of p
-		if (p->left == curr) {
-			p->left = curr->left;
-			p->lbit = 0;
-		}
-//if curr is right child of p
-		if (p->right == curr) {
-			p->right = curr->right;
-			p->rbit = 0;
-		}
-	}
-//if curr has left link and right thread
-	if (curr->lbit == 1 && curr->rbit == 0) {
-		node *temp;
-		temp = curr->left;
-		if (p->left == curr) {
-			p->left = temp;
-		} else {
-			p->right = temp;
-		}
-//goto rightmost node
-		while (temp->rbit == 1) {
-			temp = temp->right;
-		}
-		temp->right = curr->right;
-	}
-
-//if curr has left thread and right link
-	if (curr->lbit == 0 && curr->rbit == 1) {
-		node *temp;
-		temp = curr->left;
-		if (p->left == curr) {
-			p->left = temp;
-		} else {
-			p->right = temp;
-		}
-//goto rightmost node
-		while (temp->lbit == 1) {
-			temp = temp->left;
-		}
-		temp->left = curr->left;
-	}
-
-	cout << "Element deleted : " << x;
-	cout << "\nRoot is : " << root->data;
-	free(curr);
-
-}
-
-int main() {
-	cout << "!!!Threaded Binary Tree!!!" << endl;
-	TBT tree;
-	int ch, x;
-	node *temp = NULL;
-	node *curr = tree.getRoot();
-
-	while (1) {
-		cout << "\n1.Insert 2.Inorder 3.Preorder 4.Delete ";
-		cin >> ch;
-
-		switch (ch) {
-		case 1:
-			cout << "\nEnter number to insert : ";
-			cin >> x;
-			tree.Insert(x);
-			break;
-		case 2:
-			tree.Inorder();
-			break;
-		case 3:
-			tree.Preorder();
-			break;
-		case 4:
-			cout << "\nEnter number to remove : ";
-			cin >> x;
-			tree.remove(x);
-			break;
-
-		default:
-			exit(0);
-		}
-	}
+	
 	return 0;
 }
