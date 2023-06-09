@@ -3,28 +3,27 @@ using namespace std;
 
 class heap_array {
 	int *heap;
-	int size;
+	int maxsize;
+	int currsize;
 	int cnt = 0;
 public:
 	heap_array() {
-		size = 0;
+		maxsize = 0;
+		currsize = 0;
 		heap = NULL;
 	}
 	heap_array(int n) {
-		size = n;
-		heap = new int[size];
+		maxsize = n;
+		currsize = 0;
+		heap = new int[maxsize];
 	}
-	void insert_heap() {
-		cout << "----- Enter Heap elements ----" << endl;
-		for (int i = 0; i < size; i++) {
-			cout << i << " : ";
-			cin >> heap[i];
-		}
-		cout << endl;
+	void insert_heap(int i) {
+		heap[currsize] = i;
+		currsize++;
 	}
 	void print_heap() {
 		cout << "----- HEAP CONTENTS ----" << endl;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < currsize; i++) {
 			cout << heap[i] << "\t";
 		}
 		cout << endl;
@@ -57,11 +56,11 @@ public:
 	}
 	void heap_sort() {
 // Build heap (rearrange array)
-		for (int i = size / 2 - 1; i >= 0; i--)
-					heapify(size, i);
+		for (int i = currsize / 2 - 1; i >= 0; i--)
+					heapify(currsize, i);
 
 // One by one extract an element from heap
-		for (int i = size - 1; i >= 0; i--) {
+		for (int i = currsize - 1; i >= 0; i--) {
 // Move current root to end
 			int temp = heap[0];
 			heap[0] = heap[i];
@@ -78,8 +77,8 @@ public:
 // (i=n/2 -1) because other nodes/ ele's are leaf nodes
 // (i=n/2 -1) for 0 based indexing
 // (i=n/2)  for 1 based indexing
-		for (int i = size / 2 - 1; i >= 0; i--) {
-			heapify(size, i);
+		for (int i = currsize / 2 - 1; i >= 0; i--) {
+			heapify(currsize, i);
 		}
 
 	}
@@ -87,7 +86,9 @@ public:
 
 int main() {
 	heap_array obj(6);
-	obj.insert_heap();
+	obj.insert_heap(10);
+	obj.insert_heap(5);
+	obj.insert_heap(30);
 	cout << "Before : " << endl;
 	obj.print_heap();
 
