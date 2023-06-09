@@ -3,6 +3,71 @@
 #define size 20
 using namespace std;
 
+template<class T>
+class myqueue{
+    T* data;
+    int front;
+    int rear;
+    int currsize;
+    int maxsize;
+    
+    public:
+    myqueue(int s){
+        maxsize = s;
+        currsize = 0;
+        data = new T[maxsize];
+        front = -1;
+        rear = 0;
+    }
+    bool isEmpty(){
+        if(front==-1){
+            return true;
+        }
+        return false;
+    }
+    T getfront()
+    {
+        if(front == -1){
+            return 0;
+        }
+        return data[front];
+    }
+    void push(T x)
+    {
+        if(currsize == maxsize){
+            return;
+        }
+        if(front == -1){
+            front = 0;
+        }
+        data[rear] = x;
+        rear++;
+        currsize++;
+    }
+    
+    void pop()
+    {
+        if(front == -1){
+            return;
+        }
+        for(int i=0;i<currsize;i++){
+            data[i] = data[i+1];
+        }
+        currsize--;
+        rear--;
+        if(currsize == 0){
+            front = -1;
+            rear = 0;
+        }
+    }
+    
+    void display(){
+        for(int i=0;i<currsize;i++){
+            cout<<data[i]<<" ";
+        }
+    }
+};
+
 //-------------STACK CLASS-----------------------//
 template <class T>
 class Stack
